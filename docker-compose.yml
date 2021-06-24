@@ -1,14 +1,14 @@
 version: '2'
 networks:
-  ustream:
-    name: ustream-network
+  debezium:
+    name: debezium-network
     ipam:
       driver: default
 services:
   zookeeper:
     image: debezium/zookeeper:0.9
     networks:
-      - ustream
+      - debezium
     ports:
      - 2181:2181
      - 2888:2888
@@ -16,7 +16,7 @@ services:
   kafka:
     image: debezium/kafka:0.9
     networks:
-      - ustream
+      - debezium
     ports:
       - 9092:9092
     links:
@@ -26,22 +26,23 @@ services:
   mysql:
     image: mysql:latest
     networks:
-      - ustream
+      - debezium
     volumes:
-      - "./.mysql-data/db:/var/lib/mysql"
-      - "./init:/docker-entrypoint-initdb.d/:ro"
+      - "./mysql/.mysql-data/db:/var/lib/mysql"
+      - "./mysql/custom-mysql.cnf:/etc/mysql/conf.d/mysql.cnf"
+      - "./mysql/init:/docker-entrypoint-initdb.d/:ro"
     restart: always
     ports:
       - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: ustream
-      MYSQL_USER: staging
-      MYSQL_PASSWORD: stagingpw
+      MYSQL_DATABASE: customer
+      MYSQL_USER: debeziumuser
+      MYSQL_PASSWORD: debeziumpw
   connect:
     image: debezium/connect:0.9
     networks:
-      - ustream
+      - debezium
     ports:
      - 8083:8083
     links:
@@ -54,4 +55,25 @@ services:
      - CONFIG_STORAGE_TOPIC=my_connect_configs
      - OFFSET_STORAGE_TOPIC=my_connect_offsets
      - STATUS_STORAGE_TOPIC=my_source_connect_statuses
-
+  ksqldb-server:
+    networks:
+      - debezium
+    image: confluentinc/cp-ksql-server
+    hostname: ksqldb-server
+    depends_on:
+      - kafka
+    ports:
+      - "8088:8088"
+    environment:
+      KSQL_LISTENERS: http://0.0.0.0:8088
+      KSQL_BOOTSTRAP_SERVERS: kafka:9092
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
+  ksqldb-cli:
+    networks:
+      - debezium
+    image: confluentinc/ksql-cli
+    depends_on:
+      - ksqldb-server
+    entrypoint: /bin/sh
+    tty: true

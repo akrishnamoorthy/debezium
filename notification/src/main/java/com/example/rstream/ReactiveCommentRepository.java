@@ -46,8 +46,10 @@ public class ReactiveCommentRepository implements CommentRepository {
     	 ReceiverOptions<String, String> options = receiverOptions.subscription(Collections.singleton(TOPIC))
                  .addAssignListener(partitions -> log.debug("onPartitionsAssigned {}", partitions))
                  .addRevokeListener(partitions -> log.debug("onPartitionsRevoked {}", partitions));
-         Flux<Comment> kafkaFlux = KafkaReceiver.create(options).receive().map(record-> new Comment(record.key(),record.value(),dateFormat.format(new Date())));
-         /* kafkaFlux.subscribe(record -> {
+         Flux<Comment> kafkaFlux = KafkaReceiver.create(options).receive().map(record->
+                 new Comment(record.key(),record.value(),dateFormat.format(new Date())));
+         /**
+          kafkaFlux.subscribe(record -> {
             
              System.out.printf("Received message:  timestamp=%s key=%s value=%s\n",
                
@@ -56,14 +58,12 @@ public class ReactiveCommentRepository implements CommentRepository {
                      record.value());
                       
              
-         });*/
+         });
+          **/
         return kafkaFlux;
-        
-				
     }
 
     private List<Comment> generateComment(long interval) {
-
         Comment obj = new Comment(
 			"some", 
 			"some", 
