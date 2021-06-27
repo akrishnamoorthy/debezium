@@ -6,7 +6,8 @@ networks:
       driver: default
 services:
   zookeeper:
-    image: debezium/zookeeper:0.9
+    image: debezium/zookeeper:latest
+    container_name: dz_zookeeper
     networks:
       - debezium
     ports:
@@ -14,17 +15,22 @@ services:
      - 2888:2888
      - 3888:3888
   kafka:
-    image: debezium/kafka:0.9
+    image: debezium/kafka:latest
+    container_name: dz_kafka
     networks:
       - debezium
     ports:
-      - 9092:9092
+      - 19092:19092
     links:
       - zookeeper
     environment:
-     - ZOOKEEPER_CONNECT=zookeeper:2181
+      - ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENERS=PLAINTEXT://kafka:9092,CONNECTIONS_FROM_HOST://kafka:19092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,CONNECTIONS_FROM_HOST://localhost:19092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONNECTIONS_FROM_HOST:PLAINTEXT
   mysql:
     image: mysql:latest
+    container_name: dz_mysql
     networks:
       - debezium
     volumes:
@@ -40,7 +46,8 @@ services:
       MYSQL_USER: debeziumuser
       MYSQL_PASSWORD: debeziumpw
   connect:
-    image: debezium/connect:0.9
+    image: debezium/connect:latest
+    container_name: connect
     networks:
       - debezium
     ports:
@@ -56,9 +63,10 @@ services:
      - OFFSET_STORAGE_TOPIC=my_connect_offsets
      - STATUS_STORAGE_TOPIC=my_source_connect_statuses
   ksqldb-server:
+    container_name: dz_ksql_server
     networks:
       - debezium
-    image: confluentinc/cp-ksql-server
+    image: confluentinc/cp-ksql-server:latest
     hostname: ksqldb-server
     depends_on:
       - kafka
@@ -70,9 +78,10 @@ services:
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
   ksqldb-cli:
+    container_name: dz_ksql_cli
     networks:
       - debezium
-    image: confluentinc/ksql-cli
+    image: confluentinc/cp-ksql-cli:latest
     depends_on:
       - ksqldb-server
     entrypoint: /bin/sh

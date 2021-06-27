@@ -25,8 +25,8 @@ import reactor.kafka.receiver.ReceiverRecord;
 @Repository
 public class ReactiveCommentRepository implements CommentRepository {
 	private ReceiverOptions<String, String> receiverOptions = null;
-	  private static final String BOOTSTRAP_SERVERS = "localhost:9092";
-	    private static final String TOPIC = "MPJOBS_POSTING_DATA";
+	  private static final String BOOTSTRAP_SERVERS = "localhost:19092";
+	    private static final String TOPIC = "asgard.customer.customer";
 	    private  SimpleDateFormat dateFormat =null;
 	    private static final Logger log = LoggerFactory.getLogger(ReactiveCommentRepository.class.getName());
     @Override
@@ -43,23 +43,18 @@ public class ReactiveCommentRepository implements CommentRepository {
          props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
          receiverOptions = ReceiverOptions.create(props);
          dateFormat = new SimpleDateFormat("HH:mm:ss:SSS z dd MMM yyyy");
-    	 ReceiverOptions<String, String> options = receiverOptions.subscription(Collections.singleton(TOPIC))
-                 .addAssignListener(partitions -> log.debug("onPartitionsAssigned {}", partitions))
-                 .addRevokeListener(partitions -> log.debug("onPartitionsRevoked {}", partitions));
-         Flux<Comment> kafkaFlux = KafkaReceiver.create(options).receive().map(record->
+    	 ReceiverOptions<String, String> options = receiverOptions.subscription(Collections.singleton(TOPIC));
+
+       /**  Flux<Comment> kafkaFlux = KafkaReceiver.create(options).receive().map(record->
                  new Comment(record.key(),record.value(),dateFormat.format(new Date())));
-         /**
-          kafkaFlux.subscribe(record -> {
-            
-             System.out.printf("Received message:  timestamp=%s key=%s value=%s\n",
-               
-                     dateFormat.format(new Date(record.timestamp())),
-                     record.key(),
-                     record.value());
-                      
-             
-         });
-          **/
+        **/
+       Flux<Comment> kafkaFlux = KafkaReceiver.create(options).receive().map(record-> {
+           System.out.println("heer");
+           System.out.println(record);
+           return new Comment("c","c",dateFormat.format(new Date()));
+       });
+
+
         return kafkaFlux;
     }
 
