@@ -86,3 +86,17 @@ services:
       - ksqldb-server
     entrypoint: /bin/sh
     tty: true
+  avro-schema-registry:
+    networks:
+      - debezium
+    container_name: dz_avro_registry
+    image: confluentinc/cp-schema-registry:latest
+    restart: always
+    depends_on:
+      - zookeeper
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
+      SCHEMA_REGISTRY_HOST_NAME: avro-schema-registry
+      SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8881"
+    ports:
+      - 8881:8881
