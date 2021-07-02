@@ -63,12 +63,18 @@ Steps
     <img width="1142" alt="image" src="https://user-images.githubusercontent.com/1224501/124218110-32ec2680-db17-11eb-8955-1c6d135f3466.png">
     
 12. Aggregating data over multiple streams with ksql
-    Run below ksql streams joins and modify the topic to listen to enriched customer order information 
-    docker-compose exec ksqldb-cli ksql http://dz_ksql_server:8088
+
+     Run below ksql streams joins and modify the topic to listen to enriched customer order information 
+     
+     docker-compose exec ksqldb-cli ksql http://dz_ksql_server:8088
      ksql> SET 'auto.offset.reset' = 'earliest';
+     
      ksql> CREATE TABLE customer WITH (KAFKA_TOPIC='asgard.customer.customer',VALUE_FORMAT='AVRO', KEY='id');
+     
      ksql> CREATE STREAM customer_orders WITH (KAFKA_TOPIC='asgard.customer.customer_orders',VALUE_FORMAT='AVRO');
+     
      ksql> CREATE STREAM customer_order_details_all  AS select CO.*, C.*  from customer_orders CO LEFT JOIN customer C on CO.customer_id = C.id;
+     
      
  13. Changes in the db schema is managed automatically by AVRO as long as the changes are backward compatible. 
      Go to http://localhost:8881/subjects/asgard.customer.customer_orders-value/versions/latest . You will find that AVRO Schema is as below. 
