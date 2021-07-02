@@ -46,11 +46,13 @@ Steps
    
 9 . Import the mvn project (Detailed instructions , please google!) and bring up your browser at http://localhost:8080
     You should see the existing data from your DB displayed in the page
-    
-    <img width="955" alt="image" src="https://user-images.githubusercontent.com/1224501/124217337-ccb2d400-db15-11eb-9313-899874532ef5.png">
+    ![Uploading image.png…]()
+
 
 10. Go to your mysql and insert a new data
+
     mysql > insert into customer_orders(customer_id, dealer_details, order_city, invoice_no)  values(1,'New dealer information-pakistan', 'Lahore','343XS');
+    
     mysql > update customer_orders set dealer_details = 'Updated dealer information - Pakistan' where dealer_details = 'New dealer information-pakistan';
     
     <img width="1027" alt="image" src="https://user-images.githubusercontent.com/1224501/124217585-37fca600-db16-11eb-9889-1d773e714cd4.png">
