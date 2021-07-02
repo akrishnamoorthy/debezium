@@ -17,16 +17,19 @@ function loadNotifications () {
             var cell0 = row.insertCell(0);
             var cell1 = row.insertCell(1);
             var cell2 = row.insertCell(2);
+            var cell3 = row.insertCell(3);
 
             cell0.className = "text";
-            cell0.innerHTML = notification.id;
-
+            cell0.innerHTML = notification.new_val.id;
 
             cell1.className = "text";
-            cell1.innerHTML = notification.old_val.firstname;
+            cell1.innerHTML = notification.new_val.customerId;
 
             cell2.className = "text";
-            cell2.innerHTML =  notification.new_val.firstname;
+            cell2.innerHTML = notification.new_val.dealerDetails;
+
+            cell3.className = "text";
+            cell3.innerHTML =  notification.new_val.orderCity;
 
         });
 

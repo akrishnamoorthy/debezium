@@ -14,22 +14,24 @@
 
     <div class="row">
         <div id="title">
-            <h1>Customer Data change Alerts !!</h1>
+            <h1>New /Updated Customer orders !!</h1>
         </div>
 
         <table id="notifications" class="table table-striped">
             <thead>
             <tr>
-                <th width="10%">ID</th>
-                <th width="60%">Old Customer information</th>
-                <th width="30%">New Customer information</th>
+                <th width="10%">Order ID</th>
+                <th width="10%">Customer ID</th>
+                <th width="60%">Dealer Details</th>
+                <th width="30%">Order city</th>
             </tr>
             </thead>
             <tbody>
             <tr class="result" data-th-each="notification : ${notifications}">
                 <td>[[${notification.id}]]</td>
-                <td>[[${notification.old_val.firstname}]]</td>
-                <td>[[${notification.new_val.firstname}]]</td>
+                <td>[[${notification.customerId}]]</td>
+                <td>[[${notification.new_val.dealerDetails}]]</td>
+                <td>[[${notification.new_val.orderCity}]]</td>
             </tr>
             </tbody>
         </table>
